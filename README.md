@@ -47,7 +47,7 @@ The goal was to create a code package from my proof of concept work that could b
 
 All work was done on a Debian Bullseye VM client; the script to create the manifest files is standard bash so should work in any bash environment.
 
-The required manifest files (two) are created by the bash script `generate-manifests.sh`; download it, `chmod +x` it if required, check that the prerequisites are in plave and run the script.
+The required manifest files (two) are created by the bash script `generate-manifests.sh`; download it, `chmod +x` it if required, check that the prerequisites are in place and run the script.
 
 The bash script contains a few hardcoded values; I have placed most as variables at the top of the script. Probably not very useful for production, but great for lab work and the manifest files can be used as a base to build more sophisticated solutions on.
 
