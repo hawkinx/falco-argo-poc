@@ -121,7 +121,7 @@ The default configuration for rules files are the two files plus the directory s
 - `/etc/falco/falco_rules.local.yaml`
 - `/etc/falco/rules.d`
 
-It is possible to change this configuration, but it is not advisable to do so and probably no need to either. The files are read in the order given, with the first one being the supplied default rules that gets replaced during upgrades, the second is a for local rules and does not get overwritten. Files in the directory get read in last, presumably in alphabetical order (needs to be verified).
+It is possible to change this configuration, but it is not advisable to do so and probably no need to either. The files are read in the order given, with the first one being the supplied default rules that gets replaced during upgrades, the second is for local rules and does not get overwritten. Files in the directory get read in last, presumably in alphabetical order (needs to be verified).
 
 When deploying Falco with a Helm chart, the key `customRules:` can be used to define rules files that get placed in the directory `rules.d` on the pods in the daemonset. I could not find this explicitly stated anywhere, but it seemed logical so I tested and it worked as expected. An example of how to create a custom rules file in this way is included in the manifest for defining the ArgoCD/Falco application; for clarity I have copied it below. It is not for an entire rule, just for a macro, but shows how code can be deployed in a custom rules file. The name of the rules file `01-rules-poc.yaml` is arbitary.
 
@@ -145,6 +145,15 @@ When deploying Falco with a Helm chart, the key `customRules:` can be used to de
 
 ```
 
+Proof that rules files are loaded as expected and without errors can be found in the log files of the falco pods, for example:
+```
+    Thu Jul 14 12:18:38 2022: Falco version 0.32.0 (driver version 39ae7d40496793cf3d3e7890c9bbdc202263836b)
+    Thu Jul 14 12:18:38 2022: Falco initialized with configuration file /etc/falco/falco.yaml
+    Thu Jul 14 12:18:38 2022: Loading rules from file /etc/falco/falco_rules.yaml:
+    Thu Jul 14 12:18:39 2022: Loading rules from file /etc/falco/falco_rules.local.yaml:
+    Thu Jul 14 12:18:39 2022: Loading rules from file /etc/falco/rules.d/01-rules-poc.yaml:
+    Thu Jul 14 12:18:39 2022: Starting internal webserver, listening on port 8765
+```
 
 
 
