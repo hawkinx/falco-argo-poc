@@ -107,7 +107,7 @@ For details see Falco's own documentation: [The Falco Project/Rules](https://fal
 
 ### Defining custom rules and extending existing rules
 
-The structure of the rules is fairly simple and existing rules can be either overwritten or extended using the keyword *append*. Falco's own documentation, along with the [default rules file](https://github.com/falcosecurity/falco/blob/master/rules/falco_rules.yaml), provide enough information.
+The structure of the rules is fairly simple and existing rules can be either overwritten or extended using the keyword *append*. Falco's own documentation, along with the [default rules file](https://github.com/falcosecurity/falco/blob/master/rules/falco_rules.yaml), provides enough information.
 
 ### Deploying custom rules files
 
