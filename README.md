@@ -37,7 +37,7 @@ Deploying Falco is relatively simple; the main pod that detects anomalous behavi
 
 ## Demonstration/proof-of-concept package for Falco+ArgoCD
 
-Once I had started evaluating Falco, I found that like many of the other tools we are looking at working with documentation was limited and there were few useful examples of how to integrate Falco into an existing environment. This document is a summary of the various notes and readme files I created while getting things to work, written (hopefully) in a way that is understandable by others in the team.
+Once I had started evaluating Falco, I found that like many of the other tools we are looking at working with documentation was limited and there were few useful examples of how to integrate Falco with all the other bits we are using in our environment. This document is a summary of the various notes and readme files I created while getting things to work, written (hopefully) in a way that is understandable by others.
 
 ### Description of package
 
@@ -58,7 +58,7 @@ The script generates two different manifest files:
 
 Depending on the configuration, an MFA code may be required
 
-The first manifest file uses crossplane to configure an IAM role for use by the Falco sidekick service account that handles event streaming. The policy attached to the role enables streaming to the examples of consuming services. In this example I have an S3 bucket and a CloudWatch log group that are used by the Falco streaming function; these are also defined in this manifest file. The policy also includes permissions for access to an OpenSearch cluster that I set up when I tested that; these permissions are left in for reference as ElasticSearch/OpenSearch is currently the preferred way of consuming events as far as I know. Code that defines the bucket and the log group using crossplane is included and verified, but none for OpenSearch as support for that by crossplane is still a work in progress. OpenSearch clusters are rather expensive compared with CloudWatch or S3 also, so less suitable for lab work.
+The first manifest file uses crossplane to configure an IAM role for use by the Falco sidekick service account that handles event streaming. The policy attached to the role enables streaming to the defined consuming services. In this example I have an S3 bucket and a CloudWatch log group that are used by the Falco streaming function; these are also defined in this manifest file. The policy also includes permissions for access to the OpenSearch cluster that I set up when I tested that; these permissions are left in for reference as ElasticSearch/OpenSearch is currently the preferred way of consuming events as far as I know. Code that defines the bucket and the log group using crossplane is included and verified, but none for OpenSearch as support for that by crossplane is still a work in progress. OpenSearch clusters are rather expensive compared with CloudWatch or S3 also, so less suitable for lab work.
 
 One comment about the name of the S3 bucket - I've used the name `${AWS_ACCOUNT_ID}-falcotest` to keep it (hopefully) unique, given that S3 bucket names are global. The string `falcotest` is from a variable in the bash script that can be changed.
 
@@ -66,7 +66,7 @@ The second manifest file defines the Falco application in ArgoCD; the target clu
 
 One detail with the Falco setting for CloudWatch is that the value for the key `logstream` should be left empty; if left empty Falco will create a log stream with the name `falcosidekick-logstream` and stream the events to it. If a value is given, no log stream is created and events are not streamed unless the log stream is created manually. Manual creation of the log stream is not declarative however so unless there is a good reason for doing so, I would suggest keeping the value blank and leaving the rest to Falco.
 
-As well as the helm chart values, the manifest file defining the ArgoCD application is configured to create the `falco` namespace if that is not already done so. Code related to automatic sync is included, but commented out. 
+As well as the helm chart values, the manifest file defining the ArgoCD application is configured to create the `falco` namespace if that is not already done so. Code related to automatic sync is included, but commented out.
 
 
 ### Testing and event generation
@@ -97,7 +97,7 @@ This triggers a number of different rules and is useful for demonstration purpos
 
 ## Rules and extensions of rules
 
-As mentioned previously, local rules can be defined or existing rules extended. Initially at least, given what was found during lab work with Falco, adding exemptions to existing rules is required as normal activity by for example ArgoCD or Kubecost pods creates a lot of events.  
+As mentioned previously, local rules can be defined or existing rules extended. Initially at least, given what was found during lab work with Falco, adding exemptions to existing rules is required as normal activity by for example ArgoCD or Kubecost pods creates a lot of events.
 
 ### Definition of rules
 
@@ -113,7 +113,7 @@ The structure of the rules is fairly simple and existing rules can be either ove
 
 This is where it became a little confusing as information I was able to find seemed to assume that Falco was being installed on the nodes themselves for bare-metal Kubernetes. This appears to be the original way of installing Falco, but this option is not available with managed Kubernetes platforms such as EKS where instead Falco is deployed as a daemonset.
 
-Fortunately there is a simple solution, but first some background.  
+Fortunately there is a simple solution, but first some background.
 
 The default configuration for rules files are the two files plus the directory specified below:
 
@@ -121,9 +121,9 @@ The default configuration for rules files are the two files plus the directory s
 - `/etc/falco/falco_rules.local.yaml`
 - `/etc/falco/rules.d`
 
-It is possible to change this configuration, but it is not advisable to do so and there is no need to either. The files are read in the order given, with the first one being the supplied default rules that gets replaced during upgrades, the second is a for local rules and does not get overwritten. Files in the directory get read in last, presumably in alphabetical order (needs to be verified).  
+It is possible to change this configuration, but it is not advisable to do so and probably no need to either. The files are read in the order given, with the first one being the supplied default rules that gets replaced during upgrades, the second is a for local rules and does not get overwritten. Files in the directory get read in last, presumably in alphabetical order (needs to be verified).
 
-When deploying Falco with a Helm chart, the key `customRules:` can be used to define rules files that get placed in the directory `rules.d` on the pods in the daemonset. I could not find this explicitly stated anywhere, but it seemed logical so I tested and it worked as expected. An example of how to create a custom rules file in this way is included in the manifest for defining the ArgoCD/Falco application; for clarity I have copied it below. It is not for an entire rule, just for a macro, but shows how it is done. The name of the rules file `01-rules-poc.yaml` is arbitary.
+When deploying Falco with a Helm chart, the key `customRules:` can be used to define rules files that get placed in the directory `rules.d` on the pods in the daemonset. I could not find this explicitly stated anywhere, but it seemed logical so I tested and it worked as expected. An example of how to create a custom rules file in this way is included in the manifest for defining the ArgoCD/Falco application; for clarity I have copied it below. It is not for an entire rule, just for a macro, but shows how code can be deployed in a custom rules file. The name of the rules file `01-rules-poc.yaml` is arbitary.
 
 ```
     # Create a new rules file and installs it under /etc/falco/rules.d on the falco pod
