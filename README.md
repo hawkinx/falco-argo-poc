@@ -22,7 +22,7 @@ The purpose of plugins is stated as being to enable new event sources and new ev
 
 This page says it all, including links to information on various components: [The Falco Project/Documentation](https://falco.org/docs/)
 
-There is probably already some sort of process in place for dealing with security alerts etc from existing services and platforms; this can probably be reused for handling input from Falco also.
+There is probably already some sort of process in place for dealing with security alerts etc from existing services and platforms; this could be reused for handling input from Falco also.
 
 ### Strategy
 
@@ -145,6 +145,8 @@ When deploying Falco with a Helm chart, the key `customRules:` can be used to de
 
 ```
 
+Here I have simply added the namespaces `argod` and `crossplane-system` to the list of permitted namespaces.
+
 Proof that rules files are loaded as expected and without errors can be found in the log files of the falco pods, for example:
 ```
     Thu Jul 14 12:18:38 2022: Falco version 0.32.0 (driver version 39ae7d40496793cf3d3e7890c9bbdc202263836b)
@@ -155,7 +157,11 @@ Proof that rules files are loaded as expected and without errors can be found in
     Thu Jul 14 12:18:39 2022: Starting internal webserver, listening on port 8765
 ```
 
+## Troubleshooting Falco
 
+As always, checking the logs is the first thing to do when things aren't working as expected.
+
+It's fairly straightforward to check Kubernetes logs with Falco; the only thing that caught me out is that all the sidekick pods need to be checked/followed when debugging event streaming as only one of the pods will stream a given event. In my case it was mostly issues with the IAM roles for service accounts (IRSA) that resulted in the pods not having the access I had intended. With the main Falco pods issues with the configuration or the rule definitions will show up in the logs of all pods; syntax errors in the rules definitions for example will be visible in the rule load sequence shown at the end of the Rule sections above.
 
 
 
